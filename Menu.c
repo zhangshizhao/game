@@ -27,9 +27,11 @@ Purpose:		Level模块  */
 // Private Variables:
 //------------------------------------------------------------------------------
 Vector2D p1;
+int FFLAG;
 static AEGfxTexture *pTex1;            //Pointer to Texture (Image)
 static AEGfxTexture *pTex2;            //Pointer to Texture (Image)
 static AEGfxTexture *pTex3;            //Pointer to Texture (Image)
+static AEGfxTexture *pabout;            //Pointer to Texture (Image)
 static int AnimationController = 8; // 控制播放帧
 static int AnimationCurFramex = 1;  //帧状态
 static int AnimationCurFramey = 1;  //帧状态
@@ -100,6 +102,9 @@ void Load0(void)
 	pTex3 = AEGfxTextureLoad("list.png");
 	AE_ASSERT_MESG(pTex3, "Failed to create texture1!!");
 
+	// Texture 1: From file
+	pabout = AEGfxTextureLoad("about.png");
+	AE_ASSERT_MESG(pabout, "Failed to create texture1!!");
 
 	// 签到
 	fprintf(fp, "Menu:Load\n");
@@ -140,8 +145,16 @@ void Update0(void)
 	}
 	if (AEInputCheckTriggered(VK_ESCAPE))
 	{
-		Next = GS_Quit;
-		return;
+		if (FFLAG == 1)
+		{
+			FFLAG = 0;
+			return;
+		}
+		else
+		{
+			Next = GS_Quit;
+			return;
+		}
 	}
 	if (AEInputCheckTriggered('1'))
 	{
@@ -153,7 +166,11 @@ void Update0(void)
 		Next = GS_L2;
 		return;
 	}
-
+	if (AEInputCheckTriggered('A'))
+	{
+		FFLAG = 1;
+		return;
+	}
 	
 		
 	
@@ -196,6 +213,7 @@ void Draw0(void)
 	AEGfxSetBlendColor(0.0f, 0.0f, 0.0, 0.0f);
 	AEGfxMeshDraw(pMesh1, AE_GFX_MDM_TRIANGLES);
 
+	
 	// 画对象2
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetPosition(0.0f, 100.0f);
@@ -205,16 +223,31 @@ void Draw0(void)
 	AEGfxSetTransparency(1.0f);
 	AEGfxSetBlendColor(0.0f, 0.0f, 0.0, 0.0f);
 	AEGfxMeshDraw(pMesh2, AE_GFX_MDM_TRIANGLES);
+	if (FFLAG == 0)
+	{
+		// 画对象3
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetPosition(0.0f, -100.0f);
+		// Set texture for object 2
+		//为纹理设置初状态
+		AEGfxTextureSet(pTex3, 0.0f, 0.0f); // 参数1：纹理，偏移量(x,y)
+		AEGfxSetTransparency(1.0f);
+		AEGfxSetBlendColor(0.0f, 0.0f, 0.0, 0.0f);
+		AEGfxMeshDraw(pMesh3, AE_GFX_MDM_TRIANGLES);
+	}
 
-	// 画对象3
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetPosition(0.0f,-100.0f);
-	// Set texture for object 2
-	//为纹理设置初状态
-	AEGfxTextureSet(pTex3, 0.0f, 0.0f); // 参数1：纹理，偏移量(x,y)
-	AEGfxSetTransparency(1.0f);
-	AEGfxSetBlendColor(0.0f, 0.0f, 0.0, 0.0f);
-	AEGfxMeshDraw(pMesh3, AE_GFX_MDM_TRIANGLES);
+	if (FFLAG == 1)
+	{
+		// 画对象3
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetPosition(0.0f, -100.0f);
+		// Set texture for object 2
+		//为纹理设置初状态
+		AEGfxTextureSet(pabout, 0.0f, 0.0f); // 参数1：纹理，偏移量(x,y)
+		AEGfxSetTransparency(1.0f);
+		AEGfxSetBlendColor(0.0f, 0.0f, 0.0, 0.0f);
+		AEGfxMeshDraw(pMesh3, AE_GFX_MDM_TRIANGLES);
+	}
 
 
 	
@@ -241,6 +274,7 @@ void Unload0(void)
 	AEGfxTextureUnload(pTex1);
 	AEGfxTextureUnload(pTex2);
 	AEGfxTextureUnload(pTex3);
+	AEGfxTextureUnload(pabout);
 
 	// 签到
 	fprintf(fp, "Menu:Unload\n");
